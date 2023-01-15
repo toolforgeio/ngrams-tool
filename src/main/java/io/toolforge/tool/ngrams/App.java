@@ -12,8 +12,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.sigpwned.discourse.core.util.Discourse;
 import com.sigpwned.tabular4j.SpreadsheetFactory;
 import com.sigpwned.tabular4j.csv.CsvSpreadsheetFormatFactory;
@@ -27,6 +30,10 @@ import com.sigpwned.uax29.UAX29URLEmailTokenizer;
 import io.toolforge.toolforge4j.io.OutputSink;
 
 public class App {
+  private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
+
+  private static final int MAX_UNIQUE_NGRAM_COUNT = 1000000;
+
   private static final String CSV = CsvSpreadsheetFormatFactory.DEFAULT_FILE_EXTENSION;
 
   private static final String XLSX = XlsxSpreadsheetFormatFactory.DEFAULT_FILE_EXTENSION;
@@ -41,20 +48,36 @@ public class App {
 
   public static void main(Configuration configuration) throws Exception {
     List<NgramCount> ngrams;
+    AtomicLong count = new AtomicLong(0L);
     try (TabularWorksheetReader rows = SpreadsheetFactory.getInstance()
         .readActiveTabularWorksheet(configuration.data::getInputStream)) {
       final int textColumnIndex = rows.findColumnName(configuration.textColumnName)
           .orElseThrow(() -> new IllegalArgumentException(
               "No text column with name " + configuration.textColumnName));
+      if (LOGGER.isInfoEnabled())
+        LOGGER.info("Reading text from column {} at index {}.", configuration.textColumnName,
+            textColumnIndex);
       ngrams = compute(
-          rows.stream().parallel().map(r -> r.getCell(textColumnIndex).getValue(String.class)),
+          rows.stream().parallel().peek(r -> count.incrementAndGet())
+              .map(r -> r.getCell(textColumnIndex).getValue(String.class)),
           configuration.minNgramLength.intValue(), configuration.maxNgramLength.intValue())
-              .limit(1000000).toList();
+              .toList();
+    }
+
+    if (LOGGER.isInfoEnabled())
+      LOGGER.info("Found {} unique ngrams in {} spreadsheet rows.", ngrams.size(), count.get());
+
+    if (ngrams.size() > MAX_UNIQUE_NGRAM_COUNT) {
+      if (LOGGER.isWarnEnabled())
+        LOGGER.warn("Truncating output to {} most common unique ngrams...", MAX_UNIQUE_NGRAM_COUNT);
+      ngrams = ngrams.subList(0, MAX_UNIQUE_NGRAM_COUNT);
     }
 
     Map<String, OutputSink> outputFormats =
         Map.of(CSV, configuration.ngramsCsv, XLSX, configuration.ngramsXlsx);
     for (var outputFormat : outputFormats.entrySet()) {
+      if (LOGGER.isInfoEnabled())
+        LOGGER.info("Outputting {} report...", outputFormat);
       String outputFormatName = outputFormat.getKey();
       ByteSink outputFormatSink = outputFormat.getValue()::getOutputStream;
       try (TabularWorksheetRowWriter w = SpreadsheetFactory.getInstance()
@@ -66,6 +89,9 @@ public class App {
         }
       }
     }
+
+    if (LOGGER.isInfoEnabled())
+      LOGGER.info("Done!");
   }
 
   public static record NgramCount(String ngram, long count) {
