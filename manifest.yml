@@ -10,7 +10,9 @@ parameters:
     default: 1
     name: MinNgramLength
     description: >
-      How many words should be in the smallest ngrams?
+      This tool returns ngrams in a range of lengths. How many words should be
+      in the shortest ngrams the tool returns? A 1-gram is one word; a 2-gram
+      is two words; and so on.
     required: true
   - type: int
     minimum: 1
@@ -18,7 +20,10 @@ parameters:
     default: 3
     name: MaxNgramLength
     description: >
-      How many words should be in the longest ngrams?
+      This tool returns ngrams in a range of lengths. How many words should be
+      in the longest ngrams the tool returns? A 1-gram is one word; a 2-gram
+      is two words; and so on. This value must be no less than the value given
+      in the MinNgramLength parameter.
     required: true
   - type: string
     domain:
@@ -26,7 +31,8 @@ parameters:
       pattern: .{1,80}
     name: TextColumnName
     description: >
-      Which spreadsheet column contains the text to analyze?
+      Within the Data spreadsheet input, what is the name of the column
+      containing the text to analyze? The column name must match exactly.
     required: true
 inputs:
   - name: Data
@@ -40,7 +46,8 @@ inputs:
 outputs:
   - name: Ngrams
     description: >
-      The output containing sorted ngram data.
+      The ngram data, sorted by frequency descending. If there are more than
+      one million unique ngrams, the only the first one million are shown.
     extensions:
       - csv
       - xlsx
