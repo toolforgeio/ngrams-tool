@@ -1,4 +1,4 @@
-# NGRAMS TOOL
+# NGRAMS TOOL [![tests](https://github.com/toolforgeio/ngrams-tool/actions/workflows/tests.yml/badge.svg)](https://github.com/toolforgeio/ngrams-tool/actions/workflows/tests.yml)
 
 The NGrams Tool performs a [frequency
 analysis](https://en.wikipedia.org/wiki/Frequency_analysis) of the
