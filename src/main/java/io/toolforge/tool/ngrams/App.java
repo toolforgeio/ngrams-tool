@@ -1,3 +1,22 @@
+/*-
+ * =================================LICENSE_START==================================
+ * toolforge-ngrams-tool
+ * ====================================SECTION=====================================
+ * Copyright (C) 2022 - 2023 ToolForge
+ * ====================================SECTION=====================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==================================LICENSE_END===================================
+ */
 package io.toolforge.tool.ngrams;
 
 import static java.util.Objects.requireNonNull;
@@ -54,9 +73,8 @@ public class App {
       final int textColumnIndex = rows.findColumnName(configuration.textColumnName)
           .orElseThrow(() -> new IllegalArgumentException(
               "No text column with name " + configuration.textColumnName));
-      if (LOGGER.isInfoEnabled())
-        LOGGER.info("Reading text from column {} at index {}.", configuration.textColumnName,
-            textColumnIndex);
+      System.out.printf("Reading text from column %s at index %d.\n", configuration.textColumnName,
+          textColumnIndex);
       ngrams = compute(
           rows.stream().parallel().peek(r -> count.incrementAndGet())
               .map(r -> r.getCell(textColumnIndex).getValue(String.class)),
@@ -64,20 +82,19 @@ public class App {
               .sorted(Comparator.<NgramCount>naturalOrder().reversed()).toList();
     }
 
-    if (LOGGER.isInfoEnabled())
-      LOGGER.info("Found {} unique ngrams in {} spreadsheet rows.", ngrams.size(), count.get());
+    System.out.printf("Read %d rows, which produced %d occurrences of %d unique ngrams.\n",
+        count.get(), ngrams.stream().mapToLong(NgramCount::count).sum(), ngrams.size());
 
     if (ngrams.size() > MAX_UNIQUE_NGRAM_COUNT) {
-      if (LOGGER.isWarnEnabled())
-        LOGGER.warn("Truncating output to {} most common unique ngrams...", MAX_UNIQUE_NGRAM_COUNT);
+      System.out.printf("Truncating output to %d most common unique ngrams...\n",
+          MAX_UNIQUE_NGRAM_COUNT);
       ngrams = ngrams.subList(0, MAX_UNIQUE_NGRAM_COUNT);
     }
 
     Map<String, OutputSink> outputFormats =
         Map.of(CSV, configuration.ngramsCsv, XLSX, configuration.ngramsXlsx);
     for (var outputFormat : outputFormats.entrySet()) {
-      if (LOGGER.isInfoEnabled())
-        LOGGER.info("Outputting {} report...", outputFormat);
+      System.out.printf("Outputting %s report...\n", outputFormat.getKey());
       String outputFormatName = outputFormat.getKey();
       ByteSink outputFormatSink = outputFormat.getValue()::getOutputStream;
       try (TabularWorksheetRowWriter w = SpreadsheetFactory.getInstance()
@@ -90,8 +107,7 @@ public class App {
       }
     }
 
-    if (LOGGER.isInfoEnabled())
-      LOGGER.info("Done!");
+    System.out.printf("Done!\n");
   }
 
   public static record NgramCount(String ngram, long count) implements Comparable<NgramCount> {
@@ -144,7 +160,7 @@ public class App {
 
   public static Stream<String> ngrams(List<String> tokens, int minLength, int maxLength) {
     return IntStream.range(0, tokens.size()).boxed().flatMap(
-        i -> IntStream.rangeClosed(minLength, maxLength).filter(len -> i + len < tokens.size())
+        i -> IntStream.rangeClosed(minLength, maxLength).filter(len -> i + len <= tokens.size())
             .mapToObj(len -> String.join(" ", tokens.subList(i, i + len))));
   }
 }
