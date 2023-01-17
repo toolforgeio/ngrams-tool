@@ -61,7 +61,7 @@ public class App {
           rows.stream().parallel().peek(r -> count.incrementAndGet())
               .map(r -> r.getCell(textColumnIndex).getValue(String.class)),
           configuration.minNgramLength.intValue(), configuration.maxNgramLength.intValue())
-              .toList();
+              .sorted(Comparator.<NgramCount>naturalOrder().reversed()).toList();
     }
 
     if (LOGGER.isInfoEnabled())
@@ -94,7 +94,7 @@ public class App {
       LOGGER.info("Done!");
   }
 
-  public static record NgramCount(String ngram, long count) {
+  public static record NgramCount(String ngram, long count) implements Comparable<NgramCount> {
     public static NgramCount of(String ngram, long count) {
       return new NgramCount(ngram, count);
     }
@@ -105,6 +105,14 @@ public class App {
       this.ngram = requireNonNull(ngram);
       this.count = count;
     }
+
+    private static final Comparator<NgramCount> COMPARATOR =
+        Comparator.comparingLong(NgramCount::count).thenComparingInt(c -> c.ngram().hashCode());
+
+    @Override
+    public int compareTo(NgramCount that) {
+      return COMPARATOR.compare(this, that);
+    }
   }
 
   public static Stream<NgramCount> compute(Stream<String> texts, int minNgramLength,
@@ -112,8 +120,7 @@ public class App {
     return texts.filter(Objects::nonNull).filter(not(String::isBlank))
         .flatMap(s -> ngrams(s, minNgramLength, maxNgramLength))
         .collect(groupingBy(identity(), counting())).entrySet().stream()
-        .map(e -> NgramCount.of(e.getKey(), e.getValue())).sorted(Comparator
-            .comparingLong(NgramCount::count).reversed().thenComparing(NgramCount::ngram));
+        .map(e -> NgramCount.of(e.getKey(), e.getValue()));
   }
 
   public static Stream<String> ngrams(String text, int minLength, int maxLength) {
