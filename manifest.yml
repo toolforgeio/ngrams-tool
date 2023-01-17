@@ -9,7 +9,7 @@ parameters:
     maximum: 5
     default: 1
     name: MinNgramLength
-    description: >
+    description: |
       This tool returns ngrams in a range of lengths. How many words should be
       in the shortest ngrams the tool returns? A 1-gram is one word; a 2-gram
       is two words; and so on.
@@ -19,7 +19,7 @@ parameters:
     maximum: 5
     default: 3
     name: MaxNgramLength
-    description: >
+    description: |
       This tool returns ngrams in a range of lengths. How many words should be
       in the longest ngrams the tool returns? A 1-gram is one word; a 2-gram
       is two words; and so on. This value must be no less than the value given
@@ -30,13 +30,13 @@ parameters:
       type: pattern
       pattern: .{1,80}
     name: TextColumnName
-    description: >
+    description: |
       Within the Data spreadsheet input, what is the name of the column
       containing the text to analyze? The column name must match exactly.
     required: true
 inputs:
   - name: Data
-    description: >
+    description: |
       The spreadsheet containing the text to analyze. The spreadsheet must
       contain a column with a name that matches the value given in
       `TextColumnName` exactly.
@@ -47,7 +47,7 @@ inputs:
       - xlsx
 outputs:
   - name: Ngrams
-    description: >
+    description: |
       The ngram data, sorted by frequency descending. If there are more than
       one million unique ngrams, the only the first one million are shown. The
       output will contain the following columns:
