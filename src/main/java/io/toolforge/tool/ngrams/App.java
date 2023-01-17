@@ -34,8 +34,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.sigpwned.discourse.core.util.Discourse;
 import com.sigpwned.tabular4j.SpreadsheetFactory;
 import com.sigpwned.tabular4j.csv.CsvSpreadsheetFormatFactory;
@@ -49,8 +47,6 @@ import com.sigpwned.uax29.UAX29URLEmailTokenizer;
 import io.toolforge.toolforge4j.io.OutputSink;
 
 public class App {
-  private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
-
   private static final int MAX_UNIQUE_NGRAM_COUNT = 1000000;
 
   private static final String CSV = CsvSpreadsheetFormatFactory.DEFAULT_FILE_EXTENSION;
@@ -99,9 +95,10 @@ public class App {
       ByteSink outputFormatSink = outputFormat.getValue()::getOutputStream;
       try (TabularWorksheetRowWriter w = SpreadsheetFactory.getInstance()
           .writeTabularActiveWorksheet(outputFormatSink, outputFormatName)
-          .writeHeaders("ngram", "count")) {
+          .writeHeaders("ngram", "length", "count")) {
         for (NgramCount ngram : ngrams) {
           w.writeRow(List.of(WorksheetCellDefinition.ofValue(ngram.ngram()),
+              WorksheetCellDefinition.ofValue(ngram.length()),
               WorksheetCellDefinition.ofValue(ngram.count())));
         }
       }
@@ -110,16 +107,16 @@ public class App {
     System.out.printf("Done!\n");
   }
 
-  public static record NgramCount(String ngram, long count) implements Comparable<NgramCount> {
+  public static record NgramCount(String ngram, int length, long count)
+      implements Comparable<NgramCount> {
     public static NgramCount of(String ngram, long count) {
       return new NgramCount(ngram, count);
     }
 
     public NgramCount(String ngram, long count) {
+      this(requireNonNull(ngram), ngram.split(" ").length, count);
       if (count < 1L)
         throw new IllegalArgumentException("count must be positive");
-      this.ngram = requireNonNull(ngram);
-      this.count = count;
     }
 
     private static final Comparator<NgramCount> COMPARATOR =

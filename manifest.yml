@@ -37,7 +37,9 @@ parameters:
 inputs:
   - name: Data
     description: >
-      The spreadsheet containing the text to analyze.
+      The spreadsheet containing the text to analyze. The spreadsheet must
+      contain a column with a name that matches the value given in
+      `TextColumnName` exactly.
     extensions:
       - txt
       - csv
@@ -47,7 +49,12 @@ outputs:
   - name: Ngrams
     description: >
       The ngram data, sorted by frequency descending. If there are more than
-      one million unique ngrams, the only the first one million are shown.
+      one million unique ngrams, the only the first one million are shown. The
+      output will contain the following columns:
+
+      * `ngram` -- An ngram found in the text
+      * `length` -- The length of this ngram, in tokens
+      * `count` -- The number of times this ngram appeared in the given corpus
     extensions:
       - csv
       - xlsx
