@@ -2,12 +2,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.toolforge</groupId>
-    <artifactId>toolforge-ngrams-tool</artifactId>
+    <artifactId>ngrams-tool</artifactId>
     <version>0.0.0-SNAPSHOT</version>
-    <name>toolforge-ngrams-tool</name>
+    <name>ngrams-tool</name>
     <inceptionYear>2022</inceptionYear>
     <description>Example ToolForge tool using Java</description>
-    <url>https://github.com/toolforgeio/toolforge-ngrams-tool-java</url>
+    <url>https://github.com/toolforgeio/ngrams-tool</url>
     <packaging>jar</packaging>
 
     <organization>
@@ -16,9 +16,9 @@
     </organization>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/toolforgeio/toolforge-ngrams-tool-java.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/toolforgeio/toolforge-ngrams-tool-java.git</developerConnection>
-        <url>https://github.com/toolforgeio/toolforge-ngrams-tool-java/tree/main</url>
+        <connection>scm:git:ssh://git@github.com/toolforgeio/ngrams-tool.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/toolforgeio/ngrams-tool.git</developerConnection>
+        <url>https://github.com/toolforgeio/ngrams-tool/tree/main</url>
     </scm>
 
     <licenses>
@@ -37,7 +37,7 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/toolforgeio/toolforge-ngrams-tool-java</url>
+        <url>https://github.com/toolforgeio/ngrams-tool</url>
     </issueManagement>
 
     <properties>

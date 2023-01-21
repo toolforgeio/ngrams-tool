@@ -5,7 +5,7 @@ RUN apt-get update \
 
 WORKDIR /root
 
-COPY target/toolforge-ngrams-tool.jar /root/
+COPY target/ngrams-tool.jar /root/
 COPY manifest.yml /toolforge/manifest.yml
 
-ENTRYPOINT [ "/usr/bin/java", "-jar", "toolforge-ngrams-tool.jar" ]
+ENTRYPOINT [ "/usr/bin/java", "-jar", "ngrams-tool.jar" ]
