@@ -35,4 +35,4 @@ jobs:
         with:
           api-key: ${{ secrets.TOOLFORGE_API_KEY }}
       - name: Build and Deploy to ToolForge
-        run: mvn -B clean compile install deploy
+        run: mvn -B clean compile install docker:push
