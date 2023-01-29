@@ -7,11 +7,9 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 env:
   AWS_ACCOUNT_ID: ${{ vars.TOOLFORGE_AWS_ACCOUNT_ID }}
-  GITHUB_ORGANIZATION: ${{ vars.ORGANIZATION }}
 
 jobs:
   deploy:
