@@ -7,6 +7,11 @@ on:
 
 permissions:
   contents: read
+  id-token: write
+
+env:
+  AWS_ACCOUNT_ID: ${{ vars.TOOLFORGE_AWS_ACCOUNT_ID }}
+  GITHUB_ORGANIZATION: ${{ vars.ORGANIZATION }}
 
 jobs:
   deploy:
@@ -19,10 +24,6 @@ jobs:
         with:
           java-version: '17'
           distribution: 'corretto'
-      - name: Configure Maven
-        env:
-          MAVEN_SETTINGS: ${{ secrets.MAVEN_SETTINGS }}
-        run: mkdir -p ~/.m2 && echo "$MAVEN_SETTINGS" >~/.m2/settings.xml
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
